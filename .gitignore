@@ -1,0 +1,10 @@
+
+.vs/FlexProTransactionLogParser/v15/
+FlexProTransactionLogParser/bin/
+FlexProTransactionLogParser/obj/
+
+FlexProTransactionLogParser/Properties/PublishProfiles/
+
+FlexProTransactionLogParser/Properties/launchSettings.json
+
+*.user
