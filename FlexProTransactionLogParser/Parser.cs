@@ -13,10 +13,10 @@ namespace FlexProTransactionLogParser
         /// </summary>
         /// <param name="path">Path to read files / records from</param>
         /// <returns>Collection of valid parsed records </returns>
-        public static List<Record> GetRecords(string path)
+        public static List<IRecord> GetRecords(string path)
         {
             var logFiles = Directory.GetFiles(path).ToList();
-            var records = new List<Record>();
+            var records = new List<IRecord>();
             foreach (string lf in logFiles)
             {
                 records.AddRange(GetValidRecords(File.ReadAllLines(lf).ToList()));
@@ -29,7 +29,7 @@ namespace FlexProTransactionLogParser
         /// </summary>
         /// <param name="records">Records to validate</param>
         /// <returns>Collection of valid parsed records</returns>
-        private static IEnumerable<Record> GetValidRecords(IEnumerable<string> records)
+        private static IEnumerable<IRecord> GetValidRecords(IEnumerable<string> records)
         {
             var bytes = new byte[1];
             bytes[0] = Convert.ToByte("7F", 16);
@@ -71,7 +71,7 @@ namespace FlexProTransactionLogParser
         /// <param name="columnOfInterest">the column to use for determining uniqueness</param>
         /// <param name="uniques">collection of unique records</param>
         /// <param name="nonUniques">collection of non-unique records</param>
-        public static void SortUniqueFromNonUnique(List<Record> records, int columnOfInterest, ref Dictionary<string, Record> uniques, ref Dictionary<string, List<Record>> nonUniques)
+        public static void SortUniqueFromNonUnique(List<IRecord> records, int columnOfInterest, ref Dictionary<string, IRecord> uniques, ref Dictionary<string, List<IRecord>> nonUniques)
         {
             //Walk through records and collect duplicates and uniques
             foreach (var record in records)
@@ -87,7 +87,7 @@ namespace FlexProTransactionLogParser
                     var temp = uniques[key];
                     if (!nonUniques.ContainsKey(key))
                     {
-                        nonUniques.Add(key, new List<Record>() {
+                        nonUniques.Add(key, new List<IRecord>() {
                             temp,
                             record
                         });

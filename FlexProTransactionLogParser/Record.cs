@@ -1,6 +1,6 @@
 ﻿namespace FlexProTransactionLogParser
 {
-    public class Record
+    public class Record : IRecord
     {
         public string Column24 { get; set; }
         public string Column13 { get; set; }

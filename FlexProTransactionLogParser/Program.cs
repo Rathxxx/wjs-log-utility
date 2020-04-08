@@ -39,8 +39,8 @@ namespace FlexProTransactionLogParser
             
             Console.WriteLine($"{keep.Count} records located");
 
-            var uniques = new Dictionary<string, Record>();
-            var nonUniques = new Dictionary<string, List<Record>>();
+            var uniques = new Dictionary<string, IRecord>();
+            var nonUniques = new Dictionary<string, List<IRecord>>();
 
             Parser.SortUniqueFromNonUnique(keep, 23, ref uniques, ref nonUniques); // Sort using column 24
             var uniqueOut = uniques.Select(a => a.Value).Select(b => b.Raw).ToList();
