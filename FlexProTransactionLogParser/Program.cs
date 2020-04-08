@@ -20,7 +20,6 @@ namespace FlexProTransactionLogParser
                 return;
             }
 
-            var uniqueOut = new List<string>();
             var nonUniqueOut = new List<string>();
 
             _logPath = args[0];
@@ -40,22 +39,15 @@ namespace FlexProTransactionLogParser
             
             Console.WriteLine($"{keep.Count} records located");
 
-            Dictionary<string, Record> uniques = new Dictionary<string, Record>();
-            Dictionary<string, List<Record>> nonUniques = new Dictionary<string, List<Record>>();
+            var uniques = new Dictionary<string, Record>();
+            var nonUniques = new Dictionary<string, List<Record>>();
 
             Parser.SortUniqueFromNonUnique(keep, 23, ref uniques, ref nonUniques); // Sort using column 24
-            foreach (var a in uniques)
-            {
-                var b = a.Value;
-                uniqueOut.Add(b.Raw);
-            }
+            var uniqueOut = uniques.Select(a => a.Value).Select(b => b.Raw).ToList();
 
             foreach (var a in nonUniques)
             {
-                foreach (var b in a.Value)
-                {
-                    nonUniqueOut.Add(b.Raw);
-                }
+                nonUniqueOut.AddRange(a.Value.Select(b => b.Raw));
             }
             uniques.Clear();
             nonUniques.Clear();
