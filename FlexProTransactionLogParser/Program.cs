@@ -2,20 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace FlexProTransactionLogParser
 {
-    class Program
+    internal class Program
     {
 
-        private static string logPath;
-        
+        private static string _logPath;
 
-        static void Main(string[] args)
+
+        private static void Main(string[] args)
         {
-            ///args[0] = Path to Files to Parse
-            
             if(args.Length == 0)
             {
                 Console.WriteLine("Please provide a path to the transaction log files");
@@ -23,23 +20,23 @@ namespace FlexProTransactionLogParser
                 return;
             }
 
-            List<string> uniqueOut = new List<string>();
-            List<string> nonUniqueOut = new List<string>();
+            var uniqueOut = new List<string>();
+            var nonUniqueOut = new List<string>();
 
-            logPath = args[0];
-            Console.WriteLine($"Log Path: {logPath}");
+            _logPath = args[0];
+            Console.WriteLine($"Log Path: {_logPath}");
 
             // Remove output from any previous runs
-            if (File.Exists(logPath + "\\UniqueRecords.trn"))
+            if (File.Exists(_logPath + "\\UniqueRecords.trn"))
             {
-                File.Delete(logPath + "\\UniqueRecords.trn");
+                File.Delete(_logPath + "\\UniqueRecords.trn");
             }
-            if (File.Exists(logPath + "\\NonUniqueRecords.trn"))
+            if (File.Exists(_logPath + "\\NonUniqueRecords.trn"))
             {
-                File.Delete(logPath + "\\NonUniqueRecords.trn");
+                File.Delete(_logPath + "\\NonUniqueRecords.trn");
             }
 
-            var keep = Parser.GetRecords(logPath);
+            var keep = Parser.GetRecords(_logPath);
             
             Console.WriteLine($"{keep.Count} records located");
 
@@ -64,22 +61,15 @@ namespace FlexProTransactionLogParser
             nonUniques.Clear();
             Parser.SortUniqueFromNonUnique(keep, 12, ref uniques, ref nonUniques); // Sort using column 13
 
-            foreach (var a in uniques)
-            {
-                var b = a.Value;
-                uniqueOut.Add(b.Raw);
-            }
+            uniqueOut.AddRange(uniques.Select(a => a.Value).Select(b => b.Raw));
 
             foreach (var a in nonUniques)
             {
-                foreach (var b in a.Value)
-                {
-                    nonUniqueOut.Add(b.Raw);
-                }
+                nonUniqueOut.AddRange(a.Value.Select(b => b.Raw));
             }
 
-            File.WriteAllLines(logPath + "\\UniqueRecords.trn", uniqueOut);
-            File.WriteAllLines(logPath + "\\NonUniqueRecords.trn", nonUniqueOut);
+            File.WriteAllLines(_logPath + "\\UniqueRecords.trn", uniqueOut);
+            File.WriteAllLines(_logPath + "\\NonUniqueRecords.trn", nonUniqueOut);
 
             Console.WriteLine("Complete: Press any key to exit");
             Console.ReadKey();

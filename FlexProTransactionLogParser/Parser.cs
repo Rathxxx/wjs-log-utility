@@ -6,7 +6,7 @@ using System.Text;
 
 namespace FlexProTransactionLogParser
 {
-    static class Parser
+    internal static class Parser
     {
         /// <summary>
         /// Retrieves all valid records from files found at the specified path
@@ -15,9 +15,9 @@ namespace FlexProTransactionLogParser
         /// <returns>Collection of valid parsed records </returns>
         public static List<Record> GetRecords(string path)
         {
-            List<string> logFiles = Directory.GetFiles(path).ToList();
-            List<Record> records = new List<Record>();
-            foreach (var lf in logFiles)
+            var logFiles = Directory.GetFiles(path).ToList();
+            var records = new List<Record>();
+            foreach (string lf in logFiles)
             {
                 records.AddRange(GetValidRecords(File.ReadAllLines(lf).ToList()));
             }
@@ -29,16 +29,16 @@ namespace FlexProTransactionLogParser
         /// </summary>
         /// <param name="records">Records to validate</param>
         /// <returns>Collection of valid parsed records</returns>
-        private static List<Record> GetValidRecords(List<string> records)
+        private static IEnumerable<Record> GetValidRecords(IEnumerable<string> records)
         {
             var bytes = new byte[1];
             bytes[0] = Convert.ToByte("7F", 16);
             string delim1 = Encoding.GetEncoding("ISO-8859-1").GetString(bytes);
-            string delim2 = ",";
+            const string delim2 = ",";
 
-            List<Record> keep = new List<Record>();
+            var keep = new List<Record>();
             
-            foreach (var record in records)
+            foreach (string record in records)
             {
                 // Determine which delimiter to use. Default is comma
                 string delim = delim2;
@@ -48,7 +48,7 @@ namespace FlexProTransactionLogParser
                 }
 
                 // Parse the record and add to collection provided the record is valid (column 6 == 4)
-                var a = record.Split(delim, StringSplitOptions.None);
+                var a = record.Split(delim);
                 if (a[5] == "4")
                 {
 
@@ -76,7 +76,7 @@ namespace FlexProTransactionLogParser
             //Walk through records and collect duplicates and uniques
             foreach (var record in records)
             {
-                var key = (columnOfInterest == 23) ? record.Column24 : record.Column13;
+                string key = (columnOfInterest == 23) ? record.Column24 : record.Column13;
 
                 if (!uniques.ContainsKey(key))
                 {
